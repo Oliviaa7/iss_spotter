@@ -11,7 +11,7 @@ const fetchMyIP = function(callback) {
 
     if (response.statusCode !== 200) {
       
-      callback(Error( `Status code ${response.statusCode} when fetching IP. Response: ${body}`), null);
+      callback(Error(`Status code ${response.statusCode} when fetching IP. Response: ${body}`), null);
       return;
     }
 
@@ -21,4 +21,24 @@ const fetchMyIP = function(callback) {
   });
 };
 
-module.exports = { fetchMyIP };
+const fetchCoordsByIP = function(ip, callback) {
+  needle.get(`http://ipwho.is/${ip}`, (error, response, body) => {
+
+    if (error) {
+      callback(error, null);
+      return;
+    }
+
+    if (!body.success) {
+      callback(Error(`Success status was ${body.success}. Server message was ${body.message} when fetching for IP ${body.ip}.`), null);
+      return;
+    }
+
+    const latitude = body.latitude;
+    const longitude = body.longitude;
+
+    callback(null, {latitude, longitude});
+  });
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP };
